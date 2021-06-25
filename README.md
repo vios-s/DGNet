@@ -5,6 +5,8 @@ This repository contains the official Pytorch implementation of Semi-supervised 
 
 The repository is created by [Xiao Liu](https://github.com/xxxliu95), [Spyridon Thermos](https://github.com/spthermo), [Alison O'Neil](https://www.eng.ed.ac.uk/about/people/dr-alison-oneil), and [Sotirios A. Tsaftaris](https://www.eng.ed.ac.uk/about/people/dr-sotirios-tsaftaris), as a result of the collaboration between [The University of Edinburgh](https://www.eng.ed.ac.uk/) and [Canon Medical Systems Europe](https://eu.medical.canon/).
 
+The most recent updates will be made at [DGNet](https://github.com/xxxliu95/DGNet).
+
 # System Requirements
 * Pytorch 1.5.1 or higher with GPU support
 * Python 3.7.2 or higher
