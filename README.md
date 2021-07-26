@@ -1,5 +1,5 @@
 # Semi-supervised Meta-learning with Disentanglement for Domain-generalised Medical Image Segmentation
-![model](figure/model.png)
+![model](figures/model.png)
 
 This repository contains the official Pytorch implementation of [Semi-supervised Meta-learning with Disentanglement for Domain-generalised Medical Image Segmentation](https://arxiv.org/abs/2106.13292)(accepted by [MICCAI 2021](https://miccai2021.org/en/)).
 
@@ -24,7 +24,7 @@ We used two datasets in the paper: [Multi-Centre, Multi-Vendor & Multi-Disease
 Cardiac Image Segmentation Challenge (M&Ms) datast](https://www.ub.edu/mnms/) and [Spinal cord grey matter segmentation challenge dataset](http://niftyweb.cs.ucl.ac.uk/challenge/index.php). The dataloader in this repo is only for M&Ms dataset.
 
 # Qualitative results
-![results](figure/result.png)
+![results](figures/result.png)
 
 # Citation
 ```
