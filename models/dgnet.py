@@ -69,5 +69,3 @@ class DGNet(nn.Module):
                stop_gradient=self.stop_gradient)
 
         return reco, z_out, z_out_tilede, a_out, None, mu_out, logvar_out, cls_out, cls_out_tild
-
-        return reco

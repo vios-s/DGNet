@@ -7,7 +7,7 @@ from loaders.mms_dataloader_meta_split_test import get_meta_split_data_loaders
 import models
 from metrics.dice_loss import dice_coeff
 
-# python inference.py -bs 1 -c cp_dgnet_gan_meta_dir_5_tvA/ -t A -mn dgnetdirgan -g 0
+# python inference.py -bs 1 -c cp_dgnet_gan_meta_dir_5_tvA/ -t A -mn dgnet -g 0
 
 
 def get_args():
