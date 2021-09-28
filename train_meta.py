@@ -492,7 +492,6 @@ def train_net(args):
 
                 val_score, val_lv, val_myo, val_rv = eval_dgnet(model, val_loader, device, mode='val')
                 scheduler.step(val_score)
-                scheduler.step(val_score)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
                 logging.info('Validation Dice Coeff: {}'.format(val_score))
