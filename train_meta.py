@@ -477,72 +477,70 @@ def train_net(args):
 
             if optimizer.param_groups[0]['lr']<=2e-8:
                 print('Converge')
-            if (epoch+1) > k1 and (epoch+1) % k2 == 0:
-                # save checkpoint
-                if (epoch + 1) == epochs:
-                    print("Epoch checkpoint")
-                    try:
-                        os.mkdir(dir_checkpoint)
-                        logging.info('Created checkpoint directory')
-                    except OSError:
-                        pass
-                    torch.save(model.state_dict(),
-                               dir_checkpoint + f'CP_epoch{epoch + 1}.pth')
-                    logging.info(f'Checkpoint {epoch + 1} saved !')
+                if (epoch + 1) > k1 and (epoch + 1) % k2 == 0:
 
-                val_score, val_lv, val_myo, val_rv = eval_dgnet(model, val_loader, device, mode='val')
-                scheduler.step(val_score)
-                writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
+                    val_score, val_lv, val_myo, val_rv = eval_dgnet(model, val_loader, device, mode='val')
+                    scheduler.step(val_score)
+                    writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
-                logging.info('Validation Dice Coeff: {}'.format(val_score))
-                logging.info('Validation LV Dice Coeff: {}'.format(val_lv))
-                logging.info('Validation MYO Dice Coeff: {}'.format(val_myo))
-                logging.info('Validation RV Dice Coeff: {}'.format(val_rv))
+                    logging.info('Validation Dice Coeff: {}'.format(val_score))
+                    logging.info('Validation LV Dice Coeff: {}'.format(val_lv))
+                    logging.info('Validation MYO Dice Coeff: {}'.format(val_myo))
+                    logging.info('Validation RV Dice Coeff: {}'.format(val_rv))
 
-                writer.add_scalar('Dice/val', val_score, epoch)
-                writer.add_scalar('Dice/val_lv', val_lv, epoch)
-                writer.add_scalar('Dice/val_myo', val_myo, epoch)
-                writer.add_scalar('Dice/val_rv', val_rv, epoch)
+                    writer.add_scalar('Dice/val', val_score, epoch)
+                    writer.add_scalar('Dice/val_lv', val_lv, epoch)
+                    writer.add_scalar('Dice/val_myo', val_myo, epoch)
+                    writer.add_scalar('Dice/val_rv', val_rv, epoch)
 
+                    initial_itr = 0
+                    for imgs, true_masks in test_loader:
+                        if initial_itr == 5:
+                            model.eval()
+                            imgs = imgs.to(device=device, dtype=torch.float32)
+                            with torch.no_grad():
+                                reco, z_out, z_out_tilde, a_out, seg_pred, mu, logvar, _, _ = model(imgs, true_masks,
+                                                                                                    'test')
+                            seg_pred = a_out[:, :4, :, :]
+                            mask_type = torch.float32
+                            true_masks = true_masks.to(device=device, dtype=mask_type)
+                            sf_seg_pred = F.softmax(seg_pred, dim=1)
+                            writer.add_images('Test_images/test', imgs, epoch)
+                            writer.add_images('Test_images/test_reco', reco, epoch)
+                            writer.add_images('Test_images/test_true', true_masks[:, 0:3, :, :], epoch)
+                            writer.add_images('Test_images/test_pred', sf_seg_pred[:, 0:3, :, :] > 0.5, epoch)
+                            model.train()
+                            break
+                        else:
+                            pass
+                        initial_itr += 1
+                    test_score, test_lv, test_myo, test_rv = eval_dgnet(model, test_loader, device, mode='test')
 
-                initial_itr = 0
-                for imgs, true_masks in test_loader:
-                    if initial_itr == 5:
-                        model.eval()
-                        imgs = imgs.to(device=device, dtype=torch.float32)
-                        with torch.no_grad():
-                            reco, z_out, z_out_tilde, a_out, seg_pred, mu, logvar, _, _ = model(imgs, true_masks, 'test')
-                        seg_pred = a_out[:, :4, :, :]
-                        mask_type = torch.float32
-                        true_masks = true_masks.to(device=device, dtype=mask_type)
-                        sf_seg_pred = F.softmax(seg_pred, dim=1)
-                        writer.add_images('Test_images/test', imgs, epoch)
-                        writer.add_images('Test_images/test_reco', reco, epoch)
-                        writer.add_images('Test_images/test_true', true_masks[:, 0:3, :, :], epoch)
-                        writer.add_images('Test_images/test_pred', sf_seg_pred[:, 0:3, :, :] > 0.5, epoch)
-                        model.train()
-                        break
+                    if best_dice < test_score:
+                        best_dice = test_score
+                        best_lv = test_lv
+                        best_myo = test_myo
+                        best_rv = test_rv
+                        print("Epoch checkpoint")
+                        try:
+                            os.mkdir(dir_checkpoint)
+                            logging.info('Created checkpoint directory')
+                        except OSError:
+                            pass
+                        torch.save(model.state_dict(),
+                                   dir_checkpoint + 'CP_epoch.pth')
+                        logging.info('Checkpoint saved !')
                     else:
                         pass
-                    initial_itr += 1
-                test_score, test_lv, test_myo, test_rv = eval_dgnet(model, test_loader, device, mode='test')
-
-                if best_dice < test_score:
-                    best_dice = test_score
-                    best_lv = test_lv
-                    best_myo = test_myo
-                    best_rv = test_rv
-                else:
-                    pass
-                logging.info('Best Dice Coeff: {}'.format(best_dice))
-                logging.info('Best LV Dice Coeff: {}'.format(best_lv))
-                logging.info('Best MYO Dice Coeff: {}'.format(best_myo))
-                logging.info('Best RV Dice Coeff: {}'.format(best_rv))
-                writer.add_scalar('Dice/test', test_score, epoch)
-                writer.add_scalar('Dice/test_lv', test_lv, epoch)
-                writer.add_scalar('Dice/test_myo', test_myo, epoch)
-                writer.add_scalar('Dice/test_rv', test_rv, epoch)
-    writer.close()
+                    logging.info('Best Dice Coeff: {}'.format(best_dice))
+                    logging.info('Best LV Dice Coeff: {}'.format(best_lv))
+                    logging.info('Best MYO Dice Coeff: {}'.format(best_myo))
+                    logging.info('Best RV Dice Coeff: {}'.format(best_rv))
+                    writer.add_scalar('Dice/test', test_score, epoch)
+                    writer.add_scalar('Dice/test_lv', test_lv, epoch)
+                    writer.add_scalar('Dice/test_myo', test_myo, epoch)
+                    writer.add_scalar('Dice/test_rv', test_rv, epoch)
+        writer.close()
 
 
 if __name__ == '__main__':

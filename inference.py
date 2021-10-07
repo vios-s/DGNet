@@ -6,6 +6,7 @@ import utils
 from loaders.mms_dataloader_meta_split_test import get_meta_split_data_loaders
 import models
 from metrics.dice_loss import dice_coeff
+from metrics.hausdorff import hausdorff_distance
 
 # python inference.py -bs 1 -c cp_dgnet_gan_meta_dir_5_tvA/ -t A -mn dgnet -g 0
 
@@ -77,6 +78,8 @@ _, _, _ = get_meta_split_data_loaders(
 step = 0
 tot = []
 tot_sub = []
+tot_hsd = []
+tot_sub_hsd = []
 flag = '000'
 # i = 0
 for imgs, true_masks, path_img in test_loader:
@@ -92,6 +95,8 @@ for imgs, true_masks, path_img in test_loader:
         flag = path_img[0][-10: -7]
         tot.append(sum(tot_sub)/len(tot_sub))
         tot_sub = []
+        tot_hsd.append(sum(tot_sub_hsd)/len(tot_sub_hsd))
+        tot_sub_hsd = []
     with torch.no_grad():
         reco, z_out, z_out_tilde, a_out, _, mu, logvar, cls_out, _ = model(imgs, true_masks, 'test')
 
@@ -99,7 +104,9 @@ for imgs, true_masks, path_img in test_loader:
     pred = F.softmax(mask_pred, dim=1)
     pred = (pred > 0.5).float()
     dice = dice_coeff(pred[:, 0:3, :, :], true_masks[:, 0:3, :, :], device).item()
+    hsd = hausdorff_distance(pred[:, 0:3, :, :], true_masks[:, 0:3, :, :])
     tot_sub.append(dice)
+    tot_sub_hsd.append(hsd)
     print(step)
     step += 1
 
@@ -107,3 +114,8 @@ print(tot)
 
 print(sum(tot)/len(tot))
 print(statistics.stdev(tot))
+
+print(tot_hsd)
+
+print(sum(tot_hsd)/len(tot_hsd))
+print(statistics.stdev(tot_hsd))
