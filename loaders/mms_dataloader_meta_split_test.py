@@ -44,6 +44,8 @@ Re_dir = [ReA_dir, ReB2_dir, ReB3_dir, ReC_dir, ReD_dir]
 Labeled_data_dir = [LabeledVendorA_data_dir, LabeledVendorB2_data_dir, LabeledVendorB3_data_dir, LabeledVendorC_data_dir, LabeledVendorD_data_dir]
 Labeled_mask_dir = [LabeledVendorA_mask_dir, LabeledVendorB2_mask_dir, LabeledVendorB3_mask_dir, LabeledVendorC_mask_dir, LabeledVendorD_mask_dir]
 
+resampling_rate = 1.2
+
 def get_meta_split_data_loaders(batch_size, test_vendor='D', image_size=224):
 
     random.seed(14)
@@ -360,7 +362,7 @@ class ImageFolder(data.Dataset):
                     y_region = norm_mask.size(-1) // 2
 
                 # resize and center-crop to 280x280
-                resize_order = re / 1.1
+                resize_order = re / resampling_rate
                 resize_size_h = int(img_size[-2] * resize_order)
                 resize_size_w = int(img_size[-1] * resize_order)
 
@@ -469,7 +471,7 @@ class ImageFolder(data.Dataset):
                     x_region = norm_mask.size(-2) // 2
                     y_region = norm_mask.size(-1) // 2
 
-                resize_order = re / 1.1
+                resize_order = re / resampling_rate
                 resize_size_h = int(img_size[-2] * resize_order)
                 resize_size_w = int(img_size[-1] * resize_order)
 
@@ -544,7 +546,7 @@ class ImageFolder(data.Dataset):
             img = F.rotate(img, angle, Image.BILINEAR)
 
             # resize and center-crop to 280x280
-            resize_order = re / 1.1
+            resize_order = re / resampling_rate
             resize_size_h = int(img_size[-2] * resize_order)
             resize_size_w = int(img_size[-1] * resize_order)
 

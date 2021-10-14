@@ -110,7 +110,7 @@ class Decoder(nn.Module):
         self.meta_step_size = meta_step_size
         self.stop_gradient = stop_gradient
 
-        x = F.softmax(x, dim=1)
+        # x = F.softmax(x, dim=1)
 
         out = conv2d(x, self.conv1.weight, self.conv1.bias, stride=1, padding=1, meta_loss=self.meta_loss,
                      meta_step_size=self.meta_step_size,
@@ -123,7 +123,7 @@ class Decoder(nn.Module):
         out = conv2d(out, self.conv3.weight, self.conv3.bias, stride=1, padding=1, meta_loss=self.meta_loss,
                      meta_step_size=self.meta_step_size,
                      stop_gradient=self.stop_gradient)
-        out = self.bn3(out)
+        # out = self.bn3(out)
         out = conv2d(out, self.conv4.weight, self.conv4.bias, stride=1, padding=1, meta_loss=self.meta_loss,
                      meta_step_size=self.meta_step_size,
                      stop_gradient=self.stop_gradient)

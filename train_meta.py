@@ -34,7 +34,7 @@ def get_args():
     parser.add_argument('-w', '--wc', type=str, default='DGNet_LR00002_LDv5', help='The name of the writter summary.')
     parser.add_argument('-n','--name', type=str, default='default_name', help='The name of this train/test. Used when storing information.')
     parser.add_argument('-mn','--model_name', type=str, default='dgnet', help='Name of the model architecture to be used for training/testing.')
-    parser.add_argument('-lr','--learning_rate', type=float, default='0.0001', help='The learning rate for model training')
+    parser.add_argument('-lr','--learning_rate', type=float, default='0.00004', help='The learning rate for model training')
     parser.add_argument('-wi','--weight_init', type=str, default="xavier", help='Weight initialization method, or path to weights file (for fine-tuning or continuing training)')
     parser.add_argument('--save_path', type=str, default='checkpoints', help= 'Path to save model checkpoints')
     parser.add_argument('--decoder_type', type=str, default='film', help='Choose decoder type between FiLM and SPADE')
@@ -287,15 +287,16 @@ def train_net(args):
                     un_reco, un_z_out, un_z_tilde, un_a_out, _, un_mu, un_logvar, un_cls_out, _ = model(un_imgs, true_masks, 'training')
 
                     un_a_feature = F.softmax(un_a_out, dim=1)
-                    un_a_feature = un_a_feature[:,4:,:,:]
-                    un_seg_pred = un_a_out[:,:4,:,:]
+                    # un_a_feature = un_a_feature[:,4:,:,:]
+                    # un_seg_pred = un_a_out[:,:4,:,:]
 
                     latent_dim = un_a_feature.size(1)
                     un_a_feature = un_a_out.permute(0, 2, 3, 1).contiguous().view(-1, latent_dim)
                     un_a_feature = un_a_feature[torch.randperm(len(un_a_feature))]
                     un_U_a, un_S_a, un_V_a = torch.svd(un_a_feature[0:2000])
 
-                    loss_low_rank_Un_a = 0.1*torch.sum(un_S_a)
+                    # loss_low_rank_Un_a = 0.1*torch.sum(un_S_a)
+                    loss_low_rank_Un_a = un_S_a[4]
 
                     un_reco_loss = l1_distance(un_reco, un_imgs)
                     un_regression_loss = l1_distance(un_z_tilde, un_z_out)
@@ -359,7 +360,7 @@ def train_net(args):
                 # mode-1 flattering and change the original 4,8,224,224 features to 4x224x224, 8
                 # randomly pick 4000, 8 features to calculate the singular values
                 a_feature = F.softmax(a_out, dim=1)
-                a_feature = a_feature[:, 4:, :, :]
+                # a_feature = a_feature[:, 4:, :, :]
                 seg_pred = a_out[:, :4, :, :]
 
                 latent_dim = a_feature.size(1)
@@ -367,7 +368,8 @@ def train_net(args):
                 a_feature = a_feature[torch.randperm(len(a_feature))]
                 U_a, S_a, V_a = torch.svd(a_feature[0:2000])
 
-                loss_low_rank_a = 0.1*torch.sum(S_a)
+                # loss_low_rank_a = 0.1*torch.sum(S_a)
+                loss_low_rank_a = S_a[4]
 
                 reco_loss = l1_distance(reco, imgs)
                 kl_loss1 = losses.KL_divergence(logvar[:,:8], mu[:,:8])

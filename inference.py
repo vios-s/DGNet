@@ -24,7 +24,7 @@ def get_args():
     parser.add_argument('-t', '--tv', type=str, default='D', help='The name of the target vendor.')
     parser.add_argument('-w', '--wc', type=str, default='DGNet_LR00002_LDv5', help='The name of the writter summary.')
     parser.add_argument('-n','--name', type=str, default='default_name', help='The name of this train/test. Used when storing information.')
-    parser.add_argument('-mn','--model_name', type=str, default='dgnetdirgan', help='Name of the model architecture to be used for training/testing.')
+    parser.add_argument('-mn','--model_name', type=str, default='dgnet', help='Name of the model architecture to be used for training/testing.')
     parser.add_argument('-lr','--learning_rate', type=float, default='0.00002', help='The learning rate for model training')
     parser.add_argument('-wi','--weight_init', type=str, default="xavier", help='Weight initialization method, or path to weights file (for fine-tuning or continuing training)')
     parser.add_argument('--save_path', type=str, default='checkpoints', help= 'Path to save model checkpoints')
